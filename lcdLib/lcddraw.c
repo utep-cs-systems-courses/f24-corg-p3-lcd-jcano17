@@ -72,6 +72,30 @@ void drawChar5x7(u_char rcol, u_char rrow, char c,
   }
 }
 
+/** 8x7 font - this function draws background pixels
+ *  Adapted from RobG's EduKit
+ */
+void drawChar8x12(u_char rcol, u_char rrow, char c,
+     u_int fgColorBGR, u_int bgColorBGR)
+{
+  u_char col = 0;
+  u_char row = 0;
+  u_char bit = 0x01;
+  u_char oc = c - 0x20;
+
+  lcd_setArea(rcol, rrow, rcol + 7, rrow + 12); /* relative to requested col/row */
+  while (row < 12) {
+    while (col < 8) {
+      u_int colorBGR = (font_8x12[oc][col] & bit) ? fgColorBGR : bgColorBGR;
+      lcd_writeColor(colorBGR);
+      col++;
+    }
+    col = 0;
+    bit <<= 1;
+    row++;
+  }
+}
+
 /** Draw string at col,row
  *  Type:
  *  FONT_SM - small (5x8,) FONT_MD - medium (8x12,) FONT_LG - large (11x16)
@@ -91,6 +115,28 @@ void drawString5x7(u_char col, u_char row, char *string,
   while (*string) {
     drawChar5x7(cols, row, *string++, fgColorBGR, bgColorBGR);
     cols += 6;
+  }
+}
+
+/** Draw string at col,row
+ *  Type:
+ *  FONT_SM - small (5x8,) FONT_MD - medium (8x12,) FONT_LG - large (11x16)
+ *  FONT_SM_BKG, FONT_MD_BKG, FONT_LG_BKG - as above, but with background color
+ *  Adapted from RobG's EduKit
+ *
+ *  \param col Column to start drawing string
+ *  \param row Row to start drawing string
+ *  \param string The string
+ *  \param fgColorBGR Foreground color in BGR
+ *  \param bgColorBGR Background color in BGR
+ */
+void drawString8x12(u_char col, u_char row, char *string,
+        u_int fgColorBGR, u_int bgColorBGR)
+{
+  u_char cols = col;
+  while (*string) {
+    drawChar8x12(cols, row, *string++, fgColorBGR, bgColorBGR);
+    cols += 9;
   }
 }
 
@@ -114,4 +160,5 @@ void drawRectOutline(u_char colMin, u_char rowMin, u_char width, u_char height,
   fillRectangle(colMin, rowMin, 1, height, colorBGR);
   fillRectangle(colMin + width, rowMin, 1, height, colorBGR);
 }
+
 
